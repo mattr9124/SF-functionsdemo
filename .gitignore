@@ -1,0 +1,9 @@
+# Added by Illuminated Cloud
+.sfdx/
+/IlluminatedCloud/
+/out/
+target/
+node_modules/
+/.idea
+.DS_STORE
+*iml
