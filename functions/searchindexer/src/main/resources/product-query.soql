@@ -1,0 +1,11 @@
+SELECT Id, Name, ProductCode, Description
+        FROM Product2
+        WHERE Id IN (
+                SELECT ProductId
+                FROM CommerceEntitlementProduct
+        )
+        AND Id NOT IN (
+                SELECT ProductId
+                FROM WebStoreSearchProdSettings
+                WHERE IsExcludedFromSearch = TRUE
+        )
