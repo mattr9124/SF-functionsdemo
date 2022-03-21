@@ -34,9 +34,9 @@ public class BuyerGroupValueProvider extends BaseValueProvider<List<String>> {
     }
 
     private List<String> getBuyerGroupsForProduct(DataApi dataApi, List<String> policyIds) {
-        String query = "SELECT BuyerGroupId\n" +
-                "                FROM CommerceEntitlementBuyerGroup\n" +
-                "                WHERE PolicyId IN (%s)".formatted(
+        String query = "SELECT BuyerGroupId " +
+                "FROM CommerceEntitlementBuyerGroup " +
+                "WHERE PolicyId IN (%s)".formatted(
                         policyIds.stream().map(id -> "'%s'".formatted(id)).collect(Collectors.joining(","))
                 );
 

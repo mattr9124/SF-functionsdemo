@@ -1,16 +1,25 @@
 package com.searchindexer.indexer;
 
+import com.salesforce.functions.jvm.sdk.data.DataApi;
 import com.salesforce.functions.jvm.sdk.data.Record;
 import com.searchindexer.SearchIndexerInput;
 import com.searchindexer.indexer.valueprovider.ValueProvider;
+import com.searchindexer.indexer.valueprovider.ValueProviderRegistry;
 import org.apache.solr.common.SolrInputDocument;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class SolrDocumentBuilder {
 
-    public SolrInputDocument buildSolrDocument(List<SearchIndexerInput.SearchField> searchFields, Record product) {
+    private ValueProviderRegistry valueProviderRegistry;
+
+    public SolrDocumentBuilder(ValueProviderRegistry valueProviderRegistry) {
+        this.valueProviderRegistry = valueProviderRegistry;
+    }
+
+    public SolrInputDocument buildSolrDocument(DataApi dataApi, List<SearchIndexerInput.SearchField> searchFields, Record product) {
         SolrInputDocument document = new SolrInputDocument();
         // TODO get this from config
         String id = product.getStringField("Id").get();
@@ -19,36 +28,41 @@ public class SolrDocumentBuilder {
         document.addField("id", id);
 
         searchFields.forEach(searchField -> {
-            if (searchField.valueProvider.isBlank()) {
-                String indexedName = searchField.name;
+            if (searchField.valueProvider == null || searchField.valueProvider.isBlank()) {
+                String indexedSuffix = switch (searchField.type) {
+                    case String -> "_s";
+                    case Text -> "_t";
+                    case Number -> "_d";
+                    case Date -> "_dt";
+                };
 
-                switch (searchField.type) {
-                    case String -> indexedName += "_t";
-                    case Number -> indexedName += "_d";
-                    case Date -> indexedName += "_dt";
-                } // text we do nothing? TBC
+                String indexedName = searchField.name + indexedSuffix;
 
-                document.addField(indexedName, product.getStringField(searchField.name).get());
+                Optional<?> value = switch (searchField.type) {
+                    case String, Text -> product.getStringField(searchField.name);
+                    case Number ->      product.getDoubleField(searchField.name);
+                    case Date ->        product.getLongField(searchField.name); // TODO check if date even works
+                };
+
+                value.ifPresent(v -> document.addField(indexedName, v));
             } else {
-                ValueProvider<List<String>> valueProvider = getValueProvider(searchField.valueProvider);
+                ValueProvider<?> valueProvider = valueProviderRegistry.getValueProvider(searchField.valueProvider);
+                Object value = valueProvider.getValue(dataApi, product);
+
+                if (value instanceof Collection<?>) {
+                    Collection<?> values = (Collection<?>) value;
+                    if (!values.isEmpty()) {
+                        document.addField(searchField.name, values);
+                    }
+                } else if (value != null) {
+                    document.addField(searchField.name, value);
+                }
             }
         });
-
-//            document.addField("name_t", product.getStringField("Name").get());
-//            document.addField("description_t", product.getStringField("Description").get());
-//            document.addField("sku_t", product.getStringField("ProductCode").get());
-
         return document;
     }
 
 
-    private ValueProvider<List<String>> getValueProvider(String valueProvider) {
-        // TODO build some kind of registry
-        try {
-            return (ValueProvider<List<String>>) Class.forName(valueProvider).getDeclaredConstructor().newInstance();
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new RuntimeException("Unable to create value provider %s".formatted(valueProvider), e);
-        }
-    }
+
 
 }

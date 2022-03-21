@@ -3,7 +3,6 @@ package com.searchindexer;
 import java.util.List;
 
 public class SearchIndexerInput {
-    public int batchSize;
     public String serviceUrl;
     public List<SearchField> searchFields;
 
@@ -12,6 +11,11 @@ public class SearchIndexerInput {
         public boolean multiValue;
         public String name;
         public String valueProvider;
+    }
+
+    public class Config {
+        public int batchSize;
+        public boolean noCache;
     }
 
     public enum FieldType {

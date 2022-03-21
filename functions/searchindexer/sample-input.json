@@ -1,0 +1,32 @@
+{
+  "serviceUrl": "http://ec2-3-134-97-229.us-east-2.compute.amazonaws.com:8983/solr/commerce",
+  "searchFields": [
+    {
+      "name": "Name",
+      "multiValue": false,
+      "type": "String"
+    },
+    {
+      "name": "Description",
+      "multiValue": false,
+      "type": "Text"
+    },
+    {
+      "name": "ProductCode",
+      "multiValue": false,
+      "type": "Text"
+    },
+    {
+      "name": "Categories",
+      "multiValue": true,
+      "type": "String",
+      "valueProvider": "com.searchindexer.indexer.valueprovider.CategoryValueProvider"
+    },
+    {
+      "name": "BuyerGroups",
+      "multiValue": true,
+      "type": "String",
+      "valueProvider": "com.searchindexer.indexer.valueprovider.BuyerGroupValueProvider"
+    }
+  ]
+}

@@ -54,7 +54,7 @@ public class CategoryValueProvider extends BaseValueProvider<List<String>> {
     private Map<String, Category> buildCategoryMap(List<Record> allCategories) {
         return allCategories.stream().map(rec ->
                 new Category(rec.getStringField("Id").get(),
-                        rec.getStringField("ParentCategoryId").orElseGet(() -> ""),
+                        rec.getStringField("ParentCategoryId").orElse(""),
                         rec.getStringField("Name").get())).collect(
                 Collectors.toMap(cat -> cat.id, Function.identity()));
     }

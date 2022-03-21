@@ -9,6 +9,8 @@ import com.salesforce.functions.jvm.sdk.data.Record;
 import com.salesforce.functions.jvm.sdk.data.RecordQueryResult;
 import com.salesforce.functions.jvm.sdk.data.error.DataApiException;
 import com.searchindexer.indexer.SolrDocumentBuilder;
+import com.searchindexer.indexer.valueprovider.ValueProviderRegistry;
+import com.searchindexer.indexer.valueprovider.ValueProviderRegistryImpl;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
@@ -17,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,28 +35,55 @@ public class SearchIndexerFunction implements SalesforceFunction<SearchIndexerIn
             throws Exception {
 
         SearchIndexerInput searchIndexerInput = event.getData();
-
         String url = searchIndexerInput.serviceUrl;
-                //"http://ec2-3-134-97-229.us-east-2.compute.amazonaws.com:8983/solr/commerce";
+
+        if (url == null || url.isBlank()) {
+            return fail("No URL found!");
+        }
+
+        LOGGER.info("Using Solr instance URL {}", url);
+
+        List<SearchIndexerInput.SearchField> searchFields = searchIndexerInput.searchFields;
+
+        if (searchFields == null || searchFields.isEmpty()) {
+            return fail("No search fields found");
+        }
+
         Org org = context.getOrg().orElseThrow();
 
-//        DataApi dataApi = new EnhancedDataApi(org.getDataApi()); doesn't work :( --> customer classloader blocks me
         DataApi dataApi = org.getDataApi();
 
-        // TODO worry about batch size later - look at queryMore API
-//        List<Record> productRecords = queryForProducts(dataApi, searchIndexerInput.getBatchSize());
-
         List<Record> productRecords = queryForProducts(dataApi);
+        if (productRecords.isEmpty()) {
+            return fail("No products found");
+        }
 
-        List<SolrInputDocument> inputDocuments = buildInputDocuments(searchIndexerInput.searchFields, dataApi, productRecords);
+        LOGGER.info("Found {} products to index", productRecords.size());
+
+        LOGGER.info("Building input documents");
+        List<SolrInputDocument> inputDocuments = buildInputDocuments(searchFields, dataApi, productRecords);
 
         SolrClient solrClient = getSolrClient(url);
 
+        LOGGER.info("Clearing previous index");
         clearIndex(solrClient);
 
+        LOGGER.info("Indexing new documents");
         indexDocuments(inputDocuments, solrClient);
 
-        return new SearchIndexerOutput();
+        SearchIndexerOutput searchIndexerOutput = new SearchIndexerOutput();
+
+        searchIndexerOutput.numberOfProductsIndexed = productRecords.size();
+        searchIndexerOutput.success = true;
+        return searchIndexerOutput;
+    }
+
+    private SearchIndexerOutput fail(String errorMessage) {
+        SearchIndexerOutput searchIndexerOutput = new SearchIndexerOutput();
+        searchIndexerOutput.numberOfProductsIndexed = 0;
+        searchIndexerOutput.success = false;
+        searchIndexerOutput.errorMessages = Collections.singletonList(errorMessage);
+        return searchIndexerOutput;
     }
 
     private void indexDocuments(List<SolrInputDocument> inputDocuments, SolrClient solrClient) throws SolrServerException, IOException {
@@ -73,9 +103,9 @@ public class SearchIndexerFunction implements SalesforceFunction<SearchIndexerIn
     }
 
     private List<SolrInputDocument> buildInputDocuments(List<SearchIndexerInput.SearchField> searchFields, DataApi dataApi, List<Record> productRecords) {
-        SolrDocumentBuilder solrDocumentBuilder = new SolrDocumentBuilder();
+        SolrDocumentBuilder solrDocumentBuilder = new SolrDocumentBuilder(new ValueProviderRegistryImpl());
         return productRecords.parallelStream()
-                .map(product -> solrDocumentBuilder.buildSolrDocument(searchFields, product))
+                .map(product -> solrDocumentBuilder.buildSolrDocument(dataApi, searchFields, product))
                 .toList();
     }
 
