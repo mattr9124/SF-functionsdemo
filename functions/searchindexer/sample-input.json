@@ -6,7 +6,7 @@
     {
       "name": "Name",
       "multiValue": false,
-      "type": "String"
+      "type": "Text"
     },
     {
       "name": "Description",
@@ -22,25 +22,25 @@
       "name": "Price",
       "multiValue": false,
       "type": "Number",
-      "valueProvider": "com.searchindexer.indexer.valueprovider.PriceValueProvider"
+      "valueProvider": "PriceValueProvider"
     },
     {
       "name": "Media",
       "multiValue": false,
       "type": "String",
-      "valueProvider": "com.searchindexer.indexer.valueprovider.MediaValueProvider"
+      "valueProvider": "MediaValueProvider"
     },
     {
       "name": "Categories",
       "multiValue": true,
       "type": "String",
-      "valueProvider": "com.searchindexer.indexer.valueprovider.CategoryValueProvider"
+      "valueProvider": "CategoryValueProvider"
     },
     {
       "name": "BuyerGroups",
       "multiValue": true,
       "type": "String",
-      "valueProvider": "com.searchindexer.indexer.valueprovider.BuyerGroupValueProvider"
+      "valueProvider": "BuyerGroupValueProvider"
     }
   ]
 }
