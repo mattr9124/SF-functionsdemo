@@ -1,6 +1,7 @@
 {
   "serviceUrl": "http://ec2-3-134-97-229.us-east-2.compute.amazonaws.com:8983/solr/commerce",
   "communityId": "0DB7a0000009XoQGAU",
+  "storeId": "0ZE7a0000008oPbGAI",
   "searchFields": [
     {
       "name": "Name",
@@ -15,7 +16,13 @@
     {
       "name": "ProductCode",
       "multiValue": false,
-      "type": "Text"
+      "type": "String"
+    },
+    {
+      "name": "Price",
+      "multiValue": false,
+      "type": "Number",
+      "valueProvider": "com.searchindexer.indexer.valueprovider.PriceValueProvider"
     },
     {
       "name": "Media",

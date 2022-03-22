@@ -6,6 +6,7 @@ public class SearchIndexerInput {
     public String serviceUrl;
     public List<SearchField> searchFields;
     public String communityId;
+    public String storeId;
 
     public class SearchField {
         public FieldType type;
