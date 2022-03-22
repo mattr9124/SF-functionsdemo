@@ -2,9 +2,11 @@ package com.searchindexer.indexer.valueprovider;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.salesforce.functions.jvm.sdk.Org;
 import com.salesforce.functions.jvm.sdk.data.DataApi;
 import com.salesforce.functions.jvm.sdk.data.Record;
 import com.salesforce.functions.jvm.sdk.data.RecordQueryResult;
+import com.searchindexer.SearchIndexerInput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +22,20 @@ public class CategoryValueProvider extends BaseValueProvider<List<String>> {
             .maximumSize(10000)
             .build();
 
+    public CategoryValueProvider(Org org, SearchIndexerInput searchIndexerInput) {
+        super(org, searchIndexerInput);
+    }
+
     @Override
-    public List<String> getValue(DataApi dataApi, Record product) {
+    public List<String> getValue(Record product) {
         String id = product.getStringField("Id").get();
         String categoryQuery = "SELECT ProductId, ProductCategoryId\n" +
                 "FROM ProductCategoryProduct\n" +
                 "WHERE ProductId = '%s'".formatted(id);
 
-        RecordQueryResult categories = querySwallowException(dataApi, categoryQuery);
+        RecordQueryResult categories = querySwallowException(getDataApi(), categoryQuery);
 
-        List<Record> allCategories = categoryCache.get(id, f -> querySwallowException(dataApi, "SELECT Id, Name, ParentCategoryId FROM ProductCategory").getRecords());
+        List<Record> allCategories = categoryCache.get(id, f -> querySwallowException(getDataApi(), "SELECT Id, Name, ParentCategoryId FROM ProductCategory").getRecords());
         //build category hierarchy
         Map<String, Category> categoryMap = buildCategoryMap(allCategories);
 

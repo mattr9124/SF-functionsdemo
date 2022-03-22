@@ -9,7 +9,6 @@ import com.salesforce.functions.jvm.sdk.data.Record;
 import com.salesforce.functions.jvm.sdk.data.RecordQueryResult;
 import com.salesforce.functions.jvm.sdk.data.error.DataApiException;
 import com.searchindexer.indexer.SolrDocumentBuilder;
-import com.searchindexer.indexer.valueprovider.ValueProviderRegistry;
 import com.searchindexer.indexer.valueprovider.ValueProviderRegistryImpl;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Describe SearchIndexerFunction here.
@@ -35,6 +33,7 @@ public class SearchIndexerFunction implements SalesforceFunction<SearchIndexerIn
             throws Exception {
 
         SearchIndexerInput searchIndexerInput = event.getData();
+
         String url = searchIndexerInput.serviceUrl;
 
         if (url == null || url.isBlank()) {
@@ -61,7 +60,7 @@ public class SearchIndexerFunction implements SalesforceFunction<SearchIndexerIn
         LOGGER.info("Found {} products to index", productRecords.size());
 
         LOGGER.info("Building input documents");
-        List<SolrInputDocument> inputDocuments = buildInputDocuments(searchFields, dataApi, productRecords);
+        List<SolrInputDocument> inputDocuments = buildInputDocuments(searchIndexerInput, org, productRecords);
 
         SolrClient solrClient = getSolrClient(url);
 
@@ -71,10 +70,13 @@ public class SearchIndexerFunction implements SalesforceFunction<SearchIndexerIn
         LOGGER.info("Indexing new documents");
         indexDocuments(inputDocuments, solrClient);
 
+        LOGGER.info("Indexing complete");
+
         SearchIndexerOutput searchIndexerOutput = new SearchIndexerOutput();
 
         searchIndexerOutput.numberOfProductsIndexed = productRecords.size();
         searchIndexerOutput.success = true;
+
         return searchIndexerOutput;
     }
 
@@ -102,10 +104,10 @@ public class SearchIndexerFunction implements SalesforceFunction<SearchIndexerIn
                 .build();
     }
 
-    private List<SolrInputDocument> buildInputDocuments(List<SearchIndexerInput.SearchField> searchFields, DataApi dataApi, List<Record> productRecords) {
+    private List<SolrInputDocument> buildInputDocuments(SearchIndexerInput searchIndexerInput, Org org, List<Record> productRecords) {
         SolrDocumentBuilder solrDocumentBuilder = new SolrDocumentBuilder(new ValueProviderRegistryImpl());
         return productRecords.parallelStream()
-                .map(product -> solrDocumentBuilder.buildSolrDocument(dataApi, searchFields, product))
+                .map(product -> solrDocumentBuilder.buildSolrDocument(org, searchIndexerInput, product))
                 .toList();
     }
 

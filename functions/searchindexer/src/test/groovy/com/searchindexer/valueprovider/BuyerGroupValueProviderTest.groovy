@@ -1,8 +1,10 @@
 package com.searchindexer.valueprovider
 
+import com.salesforce.functions.jvm.sdk.Org
 import com.salesforce.functions.jvm.sdk.data.DataApi
 import com.salesforce.functions.jvm.sdk.data.Record
 import com.salesforce.functions.jvm.sdk.data.RecordQueryResult
+import com.searchindexer.SearchIndexerInput
 import com.searchindexer.indexer.valueprovider.BuyerGroupValueProvider
 import com.searchindexer.indexer.valueprovider.ValueProvider
 import spock.lang.Specification
@@ -12,13 +14,13 @@ class BuyerGroupValueProviderTest extends Specification {
     def "get buyer groups for product"() {
         setup: "create some mocks"
 
-        def (DataApi dataApi, Record product) = setupMocks()
+        def (Org org, Record product) = setupMocks()
 
-        ValueProvider<List<String>> valueProvider = new BuyerGroupValueProvider()
+        ValueProvider<List<String>> valueProvider = new BuyerGroupValueProvider(org, new SearchIndexerInput())
 
         when:
 
-        def result = valueProvider.getValue dataApi, product
+        def result = valueProvider.getValue product
         println result
 
         then:
@@ -31,7 +33,10 @@ class BuyerGroupValueProviderTest extends Specification {
     }
 
     private List setupMocks() {
+        def org = Mock(Org)
         def dataApi = Mock(DataApi)
+
+        org.getDataApi() >> dataApi
 
         def comEntProduct = Mock(RecordQueryResult)
         def policyIds = ['1Ce7a00000000mECAQ', '1Ce7a00000000nlCAA'].collect {buildSimpleRecord 'PolicyId', it }
@@ -45,7 +50,7 @@ class BuyerGroupValueProviderTest extends Specification {
 
         def product = Mock(Record)
         product.getStringField("Id") >> Optional.of("01t7a00000AmE0GAAV");
-        [dataApi, product]
+        [org, product]
     }
 
     Record buildSimpleRecord(def field, def id) {

@@ -5,6 +5,7 @@ import java.util.List;
 public class SearchIndexerInput {
     public String serviceUrl;
     public List<SearchField> searchFields;
+    public String communityId;
 
     public class SearchField {
         public FieldType type;

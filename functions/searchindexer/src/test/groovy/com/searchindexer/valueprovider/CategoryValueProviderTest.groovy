@@ -1,8 +1,10 @@
 package com.searchindexer.valueprovider
 
+import com.salesforce.functions.jvm.sdk.Org
 import com.salesforce.functions.jvm.sdk.data.DataApi
 import com.salesforce.functions.jvm.sdk.data.Record
 import com.salesforce.functions.jvm.sdk.data.RecordQueryResult
+import com.searchindexer.SearchIndexerInput
 import com.searchindexer.indexer.valueprovider.CategoryValueProvider
 import com.searchindexer.indexer.valueprovider.ValueProvider
 import spock.lang.Specification
@@ -13,13 +15,13 @@ class CategoryValueProviderTest extends Specification {
 
         setup: "create some mocks"
 
-        def (DataApi dataApi, Record product) = setupMocks()
+        def (Org org, Record product) = setupMocks()
 
-        ValueProvider<List<String>> valueProvider = new CategoryValueProvider()
+        ValueProvider<List<String>> valueProvider = new CategoryValueProvider(org, new SearchIndexerInput())
 
         when:
 
-        def result = valueProvider.getValue dataApi, product
+        def result = valueProvider.getValue product
 
         then:
 
@@ -33,7 +35,10 @@ class CategoryValueProviderTest extends Specification {
     }
 
     private List setupMocks() {
+        def org = Mock(Org)
         def dataApi = Mock(DataApi)
+
+        org.getDataApi() >> dataApi
 
         def categories = Mock(RecordQueryResult)
         categories.records >> buildCategoryRecords()
@@ -45,7 +50,7 @@ class CategoryValueProviderTest extends Specification {
 
         def product = Mock(Record)
         product.getStringField("Id") >> Optional.of("01t7a00000AmE0IAAV");
-        [dataApi, product]
+        [org, product]
     }
 
     List<Record> buildCategoryRecords() {

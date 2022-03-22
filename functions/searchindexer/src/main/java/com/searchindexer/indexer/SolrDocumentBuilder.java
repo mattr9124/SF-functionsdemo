@@ -1,5 +1,6 @@
 package com.searchindexer.indexer;
 
+import com.salesforce.functions.jvm.sdk.Org;
 import com.salesforce.functions.jvm.sdk.data.DataApi;
 import com.salesforce.functions.jvm.sdk.data.Record;
 import com.searchindexer.SearchIndexerInput;
@@ -19,7 +20,9 @@ public class SolrDocumentBuilder {
         this.valueProviderRegistry = valueProviderRegistry;
     }
 
-    public SolrInputDocument buildSolrDocument(DataApi dataApi, List<SearchIndexerInput.SearchField> searchFields, Record product) {
+    public SolrInputDocument buildSolrDocument(Org org, SearchIndexerInput searchIndexerInput, Record product) {
+        List<SearchIndexerInput.SearchField> searchFields = searchIndexerInput.searchFields;
+
         SolrInputDocument document = new SolrInputDocument();
         // TODO get this from config
         String id = product.getStringField("Id").get();
@@ -29,12 +32,7 @@ public class SolrDocumentBuilder {
 
         searchFields.forEach(searchField -> {
             if (searchField.valueProvider == null || searchField.valueProvider.isBlank()) {
-                String indexedSuffix = switch (searchField.type) {
-                    case String -> "_s";
-                    case Text -> "_t";
-                    case Number -> "_d";
-                    case Date -> "_dt";
-                };
+                String indexedSuffix = getSuffix(searchField);
 
                 String indexedName = searchField.name + indexedSuffix;
 
@@ -46,8 +44,8 @@ public class SolrDocumentBuilder {
 
                 value.ifPresent(v -> document.addField(indexedName, v));
             } else {
-                ValueProvider<?> valueProvider = valueProviderRegistry.getValueProvider(searchField.valueProvider);
-                Object value = valueProvider.getValue(dataApi, product);
+                ValueProvider<?> valueProvider = valueProviderRegistry.getValueProvider(org, searchIndexerInput, searchField.valueProvider);
+                Object value = valueProvider.getValue(product);
 
                 if (value instanceof Collection<?>) {
                     Collection<?> values = (Collection<?>) value;
@@ -55,14 +53,24 @@ public class SolrDocumentBuilder {
                         document.addField(searchField.name, values);
                     }
                 } else if (value != null) {
-                    document.addField(searchField.name, value);
+                    String indexedSuffix = getSuffix(searchField);
+                    String indexedName = searchField.name + indexedSuffix;
+                    document.addField(indexedName, value);
                 }
             }
         });
         return document;
     }
 
-
+    private String getSuffix(SearchIndexerInput.SearchField searchField) {
+        String indexedSuffix = switch (searchField.type) {
+            case String -> "_s";
+            case Text -> "_t";
+            case Number -> "_d";
+            case Date -> "_dt";
+        };
+        return indexedSuffix;
+    }
 
 
 }

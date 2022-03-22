@@ -1,5 +1,6 @@
 package com.searchindexer.indexer
 
+import com.salesforce.functions.jvm.sdk.Org
 import com.salesforce.functions.jvm.sdk.data.DataApi
 import com.salesforce.functions.jvm.sdk.data.Record
 import com.searchindexer.SearchIndexerInput
@@ -15,12 +16,16 @@ class SolrDocumentBuilderTest extends Specification {
 
         def builder = new SolrDocumentBuilder(valueProviderRegistry)
         def searchFields = getSearchFields()
+        def searchInput = new SearchIndexerInput()
+        searchInput.searchFields = searchFields
         def product = buildProductMock()
+        def org = Mock(Org)
         def dataApi = Mock(DataApi)
+        org.getDataApi() >> dataApi
 
         when: "building a Solr document"
 
-        def document = builder.buildSolrDocument dataApi, searchFields, product
+        def document = builder.buildSolrDocument org, searchInput, product
 
         then: "Should receive correct document ready for indexing"
 
@@ -30,7 +35,7 @@ class SolrDocumentBuilderTest extends Specification {
         document.containsKey('id')
         document.containsKey('Name_s')
         document.containsKey('ProductCode_s')
-        document.containsKey('Description')
+        document.containsKey('Description_t')
         document.containsKey('Ranking_d')
         document.containsKey('Categories')
         document.containsKey('BuyerGroups')
@@ -92,13 +97,13 @@ class SolrDocumentBuilderTest extends Specification {
         def valueProviderRegistry = Mock(ValueProviderRegistry)
 
         def categoryProvider = Mock(ValueProvider)
-        categoryProvider.getValue(_, _) >> ['Espresso Machines', 'Machines', 'Products']
+        categoryProvider.getValue(_) >> ['Espresso Machines', 'Machines', 'Products']
 
         def bgProvider = Mock(ValueProvider)
-        bgProvider.getValue(_, _) >> ['0ZI7a0000004ERKGA2', '0ZI7a0000004ESwGAM']
+        bgProvider.getValue(_) >> ['0ZI7a0000004ERKGA2', '0ZI7a0000004ESwGAM']
 
-        valueProviderRegistry.getValueProvider('com.searchindexer.indexer.valueprovider.CategoryValueProvider') >> categoryProvider
-        valueProviderRegistry.getValueProvider('com.searchindexer.indexer.valueprovider.BuyerGroupValueProvider') >> bgProvider
+        valueProviderRegistry.getValueProvider(_, _, 'com.searchindexer.indexer.valueprovider.CategoryValueProvider') >> categoryProvider
+        valueProviderRegistry.getValueProvider(_, _, 'com.searchindexer.indexer.valueprovider.BuyerGroupValueProvider') >> bgProvider
 
         valueProviderRegistry
     }
