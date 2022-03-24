@@ -1,0 +1,144 @@
+{
+  "status": 0,
+  "result": {
+    "done": true,
+    "totalSize": 9,
+    "records": [
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KbGAI"
+        },
+        "ProductId": "01t7a00000AmE0IAAV",
+        "ProductCategoryId": "0ZG7a0000000GeWGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeWGAU"
+          },
+          "Name": "Espresso Machines"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KcGAI"
+        },
+        "ProductId": "01t7a00000AmE0JAAV",
+        "ProductCategoryId": "0ZG7a0000000GeXGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeXGAU"
+          },
+          "Name": "Coffee Machines"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KZGAY"
+        },
+        "ProductId": "01t7a00000AmE0GAAV",
+        "ProductCategoryId": "0ZG7a0000000GeWGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeWGAU"
+          },
+          "Name": "Espresso Machines"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KaGAI"
+        },
+        "ProductId": "01t7a00000AmE0HAAV",
+        "ProductCategoryId": "0ZG7a0000000GeWGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeWGAU"
+          },
+          "Name": "Espresso Machines"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KdGAI"
+        },
+        "ProductId": "01t7a00000AmE0KAAV",
+        "ProductCategoryId": "0ZG7a0000000GeXGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeXGAU"
+          },
+          "Name": "Coffee Machines"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KeGAI"
+        },
+        "ProductId": "01t7a00000AmE0LAAV",
+        "ProductCategoryId": "0ZG7a0000000GeXGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeXGAU"
+          },
+          "Name": "Coffee Machines"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KfGAI"
+        },
+        "ProductId": "01t7a00000AmE0MAAV",
+        "ProductCategoryId": "0ZG7a0000000GeYGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeYGAU"
+          },
+          "Name": "Coffee Beans"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KgGAI"
+        },
+        "ProductId": "01t7a00000AmE0NAAV",
+        "ProductCategoryId": "0ZG7a0000000GeYGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeYGAU"
+          },
+          "Name": "Coffee Beans"
+        }
+      },
+      {
+        "attributes": {
+          "type": "ProductCategoryProduct",
+          "url": "/services/data/v54.0/sobjects/ProductCategoryProduct/0ZR7a00000003KhGAI"
+        },
+        "ProductId": "01t7a00000AmE0OAAV",
+        "ProductCategoryId": "0ZG7a0000000GeYGAU",
+        "ProductCategory": {
+          "attributes": {
+            "type": "ProductCategory",
+            "url": "/services/data/v54.0/sobjects/ProductCategory/0ZG7a0000000GeYGAU"
+          },
+          "Name": "Coffee Beans"
+        }
+      }
+    ]
+  }
+}

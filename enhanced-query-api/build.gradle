@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+    id 'groovy'
+}
+
+group 'com.mattrossner.sf.functions'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.salesforce.functions:sf-fx-sdk-java:1.0.0'
+    implementation 'com.google.code.gson:gson:2.9.0'
+    implementation fileTree(dir: 'lib', include: '*.jar')
+    implementation 'org.codehaus.groovy:groovy-all:3.0.10'
+    testImplementation 'org.spockframework:spock-core:2.2-M1-groovy-3.0'
+}
+
+test {
+    useJUnitPlatform()
+}
