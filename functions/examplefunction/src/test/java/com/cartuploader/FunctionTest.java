@@ -1,4 +1,4 @@
-package com.example;
+package com.cartuploader;
 
 import com.salesforce.functions.jvm.sdk.Context;
 import com.salesforce.functions.jvm.sdk.InvocationEvent;

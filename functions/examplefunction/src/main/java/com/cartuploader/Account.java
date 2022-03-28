@@ -1,4 +1,4 @@
-package com.example;
+package com.cartuploader;
 
 public class Account {
     private final String id;
