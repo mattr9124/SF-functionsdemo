@@ -3,12 +3,13 @@ package com.cartuploader;
 import com.salesforce.functions.jvm.sdk.Context;
 import com.salesforce.functions.jvm.sdk.InvocationEvent;
 import com.salesforce.functions.jvm.sdk.SalesforceFunction;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.Base64;
+import java.util.List;
 
 /**
  * Describe CsvCartUploadFunction here.
@@ -20,27 +21,32 @@ public class CsvCartUploadFunction implements SalesforceFunction<CartUploadInput
     public CartUploadOutput apply(InvocationEvent<CartUploadInput> event, Context context)
             throws Exception {
 
-        byte[] data = extractDataFromEvent(event);
+        CartUploadInput cartUploadInput = event.getData();
 
-        String dataAsString = new String(data);
+        Converter converter = getConverterForContentType(cartUploadInput.contentType);
 
-        CSVParser csvRecords = CSVParser.parse(dataAsString, CSVFormat.Builder
-                .create()
-                .setHeader("sku", "qty")
-                .setSkipHeaderRecord(true)
-                .setDelimiter(';')
-                .build());
+        InputStream inputStream = extractDataFromEvent(event);
 
-        List<CartUploadOutput.CartEntry> cartEntries = csvRecords.getRecords().stream()
-                .map(record -> new CartUploadOutput.CartEntry(
-                        record.get("sku"),
-                        Integer.parseInt(record.get("qty")))
-                ).toList();
+        List<CartUploadOutput.CartEntry> cartEntries = converter.convert(inputStream);
 
         return new CartUploadOutput(cartEntries);
     }
 
-    private byte[] extractDataFromEvent(InvocationEvent<CartUploadInput> event) {
-        return Base64.getDecoder().decode(event.getData().base64EncodedData);
+    private Converter getConverterForContentType(String contentType) {
+        if (contentType == null) {
+            throw new IllegalArgumentException("Content type cannot be null");
+        }
+
+        if (contentType.contains("text/csv")) {
+            return new CsvConverter();
+        } else if (contentType.contains("excel")) {
+            return new ExcelConverter();
+        }
+
+        throw new RuntimeException("Cannot find appropriate converter for content type %s".formatted(contentType));
+    }
+
+    private InputStream extractDataFromEvent(InvocationEvent<CartUploadInput> event) {
+        return new ByteArrayInputStream(Base64.getDecoder().decode(event.getData().base64EncodedData));
     }
 }
