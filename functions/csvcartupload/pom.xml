@@ -15,11 +15,23 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>local-libs</id>
+            <url>file:///${project.basedir}/lib</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>com.salesforce.functions</groupId>
             <artifactId>sf-fx-sdk-java</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>sf-light-http-client</groupId>
+            <artifactId>sf-light-http-client</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
