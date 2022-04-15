@@ -1,0 +1,10 @@
+<template>
+
+    <lightning-card>
+        <lightning-file-upload label="Upload file" name="UploadFile" onuploadfinished={afterFileUpload}></lightning-file-upload>
+    </lightning-card>
+
+
+    <lightning-textarea label="Result" value={parsedResult}></lightning-textarea>
+
+</template>
