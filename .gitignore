@@ -7,3 +7,5 @@ node_modules/
 **/.idea
 .DS_Store
 *iml
+/force-app/main/default/profiles/Admin.profile-meta.xml
+/force-app/main/default/profiles/Trial Customer Portal User.profile-meta.xml
