@@ -19,7 +19,7 @@ public with sharing class FileUploadHandlerAsync {
 
         System.debug(JSON.serializePretty(invocation));
 
-        String response = invocation.getResponse();
+        String response = JSON.serialize(invocation);
 
         // TODO do something with response
 
@@ -51,9 +51,17 @@ public with sharing class FileUploadHandlerAsync {
 
     class FileUploadCallback implements Functions.FunctionCallback {
         public void handleResponse(Functions.FunctionInvocation invocation) {
-
             System.debug(JSON.serializePretty(invocation));
 
+            UploadEvent__e event = new UploadEvent__e();
+            event.Payload__c = invocation.getResponse();
+            Database.SaveResult result = EventBus.publish(event);
+
+            if (!result.success) {
+                for(Database.Error error : result.getErrors()) {
+                    System.debug(LoggingLevel.ERROR, error.message);
+                }
+            }
         }
     }
 

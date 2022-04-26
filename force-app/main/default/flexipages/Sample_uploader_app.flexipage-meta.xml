@@ -7,6 +7,12 @@
                 <identifier>c_fileUploader1</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>fileUploadAsync</componentName>
+                <identifier>c_fileUploadAsync1</identifier>
+            </componentInstance>
+        </itemInstances>
         <name>main</name>
         <type>Region</type>
     </flexiPageRegions>
