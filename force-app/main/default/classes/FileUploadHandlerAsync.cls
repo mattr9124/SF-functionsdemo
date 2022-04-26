@@ -1,8 +1,4 @@
 public with sharing class FileUploadHandlerAsync {
-
-    private final static String csvMimeType = 'text/csv';
-    private final static String excelMimeType = 'application/vnd.excel';
-
     @AuraEnabled
     public static String processFileUpload(String contentVersionId) {
         Functions.Function fileUploadFunction = Functions.Function.get('functiondemo.largefileupload');
