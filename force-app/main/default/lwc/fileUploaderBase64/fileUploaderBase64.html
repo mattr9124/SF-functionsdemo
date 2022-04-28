@@ -1,0 +1,11 @@
+<template>
+
+    <lightning-card>
+        <h1>Regular Upload - Base 64</h1>
+        <lightning-file-upload label="Upload file" name="UploadFile" onuploadfinished={afterFileUpload}></lightning-file-upload>
+    </lightning-card>
+
+
+    <lightning-textarea label="Result" value={parsedResult}></lightning-textarea>
+
+</template>
